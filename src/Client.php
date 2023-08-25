@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use BrokeYourBike\ResolveUri\ResolveUriTrait;
 use BrokeYourBike\ParallexBankExtract\Responses\LoginResponse;
 use BrokeYourBike\ParallexBankExtract\Responses\InterBankPaymentResponse;
+use BrokeYourBike\ParallexBankExtract\Responses\AccountsResponse;
 use BrokeYourBike\ParallexBankExtract\Interfaces\TransactionInterface;
 use BrokeYourBike\ParallexBankExtract\Interfaces\ConfigInterface;
 use BrokeYourBike\HttpEnums\HttpMethodEnum;
@@ -98,6 +99,20 @@ class Client implements HttpClientInterface
         $uri = (string) $this->resolveUriFor($this->config->getUrl(), 'api/authentication/Authentication/Login');
         $response = $this->httpClient->request(HttpMethodEnum::POST->value, $uri, $options);
         return new LoginResponse($response);
+    }
+
+    public function accounts(): AccountsResponse
+    {
+        $options = [
+            \GuzzleHttp\RequestOptions::HEADERS => [
+                'Accept' => 'application/json',
+                'Authorization' => "Bearer {$this->getAuthToken()}",
+            ],
+        ];
+
+        $uri = (string) $this->resolveUriFor($this->config->getUrl(), 'api/authentication/Authentication/GetAccounts');
+        $response = $this->httpClient->request(HttpMethodEnum::GET->value, $uri, $options);
+        return new AccountsResponse($response);
     }
 
     public function interBankPayment(TransactionInterface $transaction): InterBankPaymentResponse
